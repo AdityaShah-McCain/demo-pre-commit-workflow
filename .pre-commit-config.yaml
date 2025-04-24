@@ -23,18 +23,15 @@ repos:
               if (!(Test-Path \"$_\\.terraform\")) { terraform init -backend=false | Out-Null }
               $output = tflint --chdir $_ 2>&1
 
-              # Format output for readability
+              # Only display ERROR messages
               if ($output) {
-                $output -split '  Reference: ' | ForEach-Object {
-                  if ($_ -match 'ERROR') { Write-Host \"🔥 ERROR: $_\" -ForegroundColor Red }
-                  elseif ($_ -match 'Warning') { Write-Host \"⚠️  WARNING: $_\" -ForegroundColor Yellow }
-                  else { Write-Host \"$_\" }
+                $output -split \"`r?`n\" | Where-Object { $_ -match 'ERROR' } | ForEach-Object {
+                  Write-Host \"🔥 ERROR: $_\" -ForegroundColor Red
                 }
               }
 
               if ($LASTEXITCODE -ne 0 -and $output -match 'ERROR') { exit 1 }
 
-              # Print separator after finishing a subfolder
               Write-Host \"--------------------------------------------------------------------------------------------------------------------\" -ForegroundColor DarkGray
             }
           }"
