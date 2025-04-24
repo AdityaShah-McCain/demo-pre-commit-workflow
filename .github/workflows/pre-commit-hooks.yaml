@@ -41,6 +41,11 @@ jobs:
           Write-Host "TFLint path: $(Get-Command tflint).Source"
           Write-Host "Terraform path: $(Get-Command terraform).Source"
 
+      - name: Check Terraform and tflint versions
+        run: |
+          terraform version
+          tflint --version
+
       - name: Install pre-commit
         run: pip install pre-commit
 
