@@ -43,6 +43,7 @@ jobs:
 
       - name: Check Terraform and tflint versions
         run: |
+          tflint --init
           terraform version
           tflint --version
 
