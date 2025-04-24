@@ -78,10 +78,10 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "1.9.5"
-          terraform_wrapper: false
+          # terraform_wrapper: false
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
