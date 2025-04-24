@@ -14,5 +14,5 @@ provider "azurerm" {
 }
 
 resource "azurerm_linux_virtual_machine" "foo" {
-  # size = "Standard_DS1_v3"
+  size = "Standard_DS1_v3"
 }
