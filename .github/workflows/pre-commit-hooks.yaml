@@ -84,9 +84,9 @@ jobs:
           terraform_wrapper: false
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v3
+        uses: terraform-linters/setup-tflint@v4
         with:
-          tflint_version: 'lastest'
+          tflint_version: 'latest'
 
       - name: Verify tools are in PATH
         shell: pwsh
