@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: tflint
+        name: tflint
+        entry: >-
+          powershell -Command "& {
+            $ErrorActionPreference = 'Stop';
+            Get-ChildItem -Recurse -Filter '*.tf' |
+            Select-Object -ExpandProperty DirectoryName |
+            Sort-Object -Unique |
+            ForEach-Object {
+              Write-Host \"🔍 Checking folder: $_\" -ForegroundColor Cyan
+              Write-Host \"--------------------------------------------------------------------------------------------------------------------\" -ForegroundColor DarkGray
+
+              if (!(Test-Path \"$_\\.terraform\")) { terraform init -backend=false | Out-Null }
+              $output = tflint --chdir $_ 2>&1
+
+              # Format output for readability
+              if ($output) {
+                $output -split '  Reference: ' | ForEach-Object {
+                  if ($_ -match 'ERROR') { Write-Host \"🔥 ERROR: $_\" -ForegroundColor Red }
+                  elseif ($_ -match 'Warning') { Write-Host \"⚠️  WARNING: $_\" -ForegroundColor Yellow }
+                  else { Write-Host \"$_\" }
+                }
+              }
+
+              if ($LASTEXITCODE -ne 0 -and $output -match 'ERROR') { exit 1 }
+
+              # Print separator after finishing a subfolder
+              Write-Host \"--------------------------------------------------------------------------------------------------------------------\" -ForegroundColor DarkGray
+            }
+          }"
+        language: system
+        pass_filenames: false
+        always_run: false
+        types: [terraform]
