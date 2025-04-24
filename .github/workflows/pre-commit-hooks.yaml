@@ -80,13 +80,13 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.5.7"
+          terraform_version: "1.9.5"
           terraform_wrapper: false
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
-          tflint_version: "v0.48.0"
+          tflint_version: 'lastest'
 
       - name: Verify tools are in PATH
         shell: pwsh
