@@ -43,6 +43,35 @@ jobs:
       - name: Initialize tflint
         run : tflint --init
 
-      - name: Run pre-commit hooks
+      - name: Run pre-commit hooks and save output
         shell: bash
-        run: pre-commit run --all-files
+        run: |
+          pre-commit run --all-files &> pre-commit.log
+          exit_code=$?
+          echo "Exit code: $exit_code"
+          exit $exit_code
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-commit-log
+          path: pre-commit.log
+
+  extract-errors:
+    name: Extract Errors from Logs on Failure
+    needs: pre-commit
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download logs
+        uses: actions/download-artifact@v4
+        with:
+          name: pre-commit-log
+          path: downloaded-logs
+
+      - name: Extract error lines
+        run: |
+          echo "🔍 Extracting errors from pre-commit logs..."
+          cat downloaded-logs/pre-commit.log | grep -Ei 'error|fail|exception|not found|traceback|warning' || echo "No matching error lines found."
